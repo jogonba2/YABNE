@@ -1,0 +1,2 @@
+# Negotiation
+Automatic negotiation environment.
