@@ -1,0 +1,75 @@
+{
+    "agent_name" : "Tyrion",
+
+    "agent_gender" : "male",
+
+    "agent_country" : "spanish",
+
+    "attributes" : {"price" : "integer", "color": "categorical", "abs": "categorical"},
+
+	"weights_attr" : {
+		"price" : 0.6,
+		"color" : 0.2,
+		"abs"    : 0.2
+	},
+	
+	"values_attr" : {
+
+		"integer"     : {
+			"price" : {
+                "properties" : {
+                    "max" : 3000,
+                    "min" : 0
+                },
+                "conditions" : {
+				    "cond_1" : [0, 1000, 1],
+				    "cond_2" : [1000, 2000, 0.5],
+				    "cond_3" : [2000, 7500, 0.3],
+                    "cond_4" : [7500, Infinity, 0]
+                }
+			}
+		},
+
+		"float"       : {},
+		"categorical" : {
+			"color" : {
+                "properties" : {
+                  "choices" : ["blue", "green", "red"]
+                },
+                "conditions" : {
+				    "cond_1" : ["blue", 0.4],
+				    "cond_2" : ["green", 0.1],
+				    "cond_3" : ["red", 1]
+                }
+			},
+			"abs" : {
+                "properties" : {
+                    "choices" : ["yes", "no"]
+                },
+                "conditions" : {
+				    "cond_1" : ["yes", 1],
+				    "cond_2" : ["no" , 0]
+                }
+			}	
+		}
+
+	},
+
+    "utility_type" : "linear",
+
+    "revoke_step" : 150,
+
+    "ur" : 0.5,
+
+    "delta" : 2,
+
+    "beta" : 0.8,
+
+    "concession_type" : "temporal_concession",
+
+    "acceptance_type" : "rational",
+
+    "offer_type" : "genetic_offer",
+
+    "s" : 1
+}

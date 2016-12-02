@@ -1,0 +1,74 @@
+{
+    "agent_name" : "JohnSnow",
+
+    "agent_gender" : "male",
+
+    "agent_country" : "spanish",
+
+    "attributes" : {"price" : "integer", "color": "categorical", "abs": "categorical"},
+
+	"weights_attr" : {
+		"price" : 0.8,
+		"color" : 0.1,
+		"abs"    : 0.1
+	},
+
+	"values_attr" : {
+
+		"integer"     : {
+			"price" : {
+                "properties" : {
+                    "max" : 6000,
+                    "min" : 0
+                },
+                "conditions" : {
+				    "cond_1" : [0, 1000, 0.1],
+				    "cond_2" : [1000, 5000, 0.7],
+				    "cond_3" : [5000, Infinity, 1]
+                }
+			}
+		},
+
+		"float"       : {},
+		"categorical" : {
+			"color" : {
+                "properties" : {
+                  "choices" : ["blue", "green", "red"]
+                },
+                "conditions" : {
+				    "cond_1" : ["blue", 0.1],
+				    "cond_2" : ["green", 0.5],
+				    "cond_3" : ["red", 1]
+                }
+			},
+			"abs" : {
+                "properties" : {
+                    "choices" : ["yes", "no"]
+                },
+                "conditions" : {
+				    "cond_1" : ["yes", 1],
+				    "cond_2" : ["no" , 0]
+                }
+			}
+		}
+
+	},
+
+    "utility_type" : "linear",
+
+    "revoke_step" : 200,
+
+    "ur" : 0.5,
+
+    "delta" : 2,
+
+    "beta" : 0.5,
+
+    "concession_type" : "behavioural_absolute_concession",
+
+    "acceptance_type" : "rational",
+
+    "offer_type" : "random_offer",
+
+    "s" : 1
+}
