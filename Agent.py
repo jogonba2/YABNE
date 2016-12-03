@@ -64,7 +64,7 @@ class Agent:
              self.concession_type == Concession.behavioural_absolute_concession or \
              self.concession_type == Concession.behavioural_averaged_concession:
 
-            if t<=self.delta:
+            if t<=self.delta*2:
                 self.s = Concession.temporal_concession(t, self.ur, self.beta, self.revoke_step)
             else:
                 self.s = self.concession_type(t, self.ur, self.memory_proposal_offers, self.memory_received_offers, self.delta)
@@ -108,7 +108,7 @@ class Agent:
         return self.memory_received_offers
 
 if __name__ == "__main__":
-    tyrion = Agent(definition_json="Tyrion.json")
+    tyrion = Agent(definition_json="./Bots/Tyrion.json")
     """
     print(tyrion.receive_offer({"price": 5000,
                                "color": "green",
@@ -116,4 +116,4 @@ if __name__ == "__main__":
                                }))
     """
    # print(tyrion.update_s(5))
-    print(tyrion.emit_offer())
+    print(tyrion.get_benefits({'abs': 'yes', 'price': 1675, 'color': 'red'}))

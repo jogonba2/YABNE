@@ -20,7 +20,7 @@ class Offers:
     # Only with int attributes #
     @staticmethod
     def genetic_offer(space, s, utility_function, attributes, weights_attr, values_attr, pob_size=50,
-                      prob_mutate=0.01, prob_mating=0.4, iterations=10, tournsize=3):
+                      prob_mutate=0.3, prob_mating=0.4, iterations=20, tournsize=3):
 
         def transform(ind, categorical_dims, index_int_2_cat, number_dims):
             h_ind = {}
@@ -41,17 +41,25 @@ class Offers:
             try:
                 h_ind = transform(ind, categorical_dims, index_int_2_cat, number_dims)
                 utility = utility_function(attributes, weights_attr, values_attr, h_ind)
-                diff = abs(s - utility)
-                if diff<0 or 1<diff: return float("inf"),
+                diff = s - utility
                 return diff,
             except:
                 return float("inf"),
 
-        def mutate(ind):
-            for i in range(len(ind)-1):
+        def mutate(ind, values_attr, number_dims, categorical_dims):
+            for i in range(len(ind)):
                 mut = uniform(0, 1) <= prob_mutate
-                rand_pos = randint(0, len(ind)-1)
-                if mut: ind[rand_pos], ind[i] = ind[i], ind[rand_pos]
+                if mut:
+                    if i in number_dims:
+                        if number_dims[i] in values_attr["integer"]:
+                            ind[i] = randint(values_attr["integer"][number_dims[i]]["properties"]["min"],
+                                             values_attr["integer"][number_dims[i]]["properties"]["max"])
+                        else:
+                            ind[i] = uniform(values_attr["integer"][number_dims[i]]["properties"]["min"],
+                                             values_attr["integer"][number_dims[i]]["properties"]["max"])
+                    else:
+                        indexes = [i for i in range(len(values_attr["categorical"][categorical_dims[i]]["properties"]["choices"]))]
+                        ind[i] = choice(indexes)
             return ind,
 
         def mate(ind_one, ind_two):
@@ -95,16 +103,19 @@ class Offers:
                 e += 1
             population.append(creator.Individual(individual))
 
-
-        toolbox.register("evaluate", f_eval, categorical_dims=categorical_dims, index_int_2_cat=index_int_2_cat, number_dims=number_dims)
+        toolbox.register("evaluate", f_eval, categorical_dims=categorical_dims,
+                         index_int_2_cat=index_int_2_cat, number_dims=number_dims)
         toolbox.register("mate", mate)
-        toolbox.register("mutate", mutate)
+        toolbox.register("mutate", mutate, values_attr=values_attr, number_dims=number_dims,
+                         categorical_dims=categorical_dims)
         toolbox.register("select", tools.selTournament, tournsize=tournsize)
         hof = tools.ParetoFront()
         population, logbook = algorithms.eaSimple(population, toolbox, cxpb=prob_mating, mutpb=prob_mutate,
-                                                      ngen=iterations, halloffame=hof)
-        return transform(hof[0], categorical_dims, index_int_2_cat, number_dims), \
-               f_eval(hof[0], categorical_dims, index_int_2_cat, number_dims )
+                                                          ngen=iterations, halloffame=hof, verbose=False)
+        best = hof[0]
+        best = transform(best, categorical_dims, index_int_2_cat, number_dims)
+        best_utility = utility_function(attributes, weights_attr, values_attr, best)
+        return best, best_utility
 
 if __name__ == "__main__":
     """

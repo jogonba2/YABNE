@@ -16,6 +16,7 @@ class Exchange:
                 offers_register.append((dealer_one.get_name(), offers))
                 offers_accepted = dealer_two.receive_offers(offers)
 
+
             else:
                 offers = dealer_two.emit_n_offers(n_offers)
                 offers_register.append((dealer_two.get_name(), offers))
