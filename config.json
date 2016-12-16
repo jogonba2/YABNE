@@ -1,0 +1,25 @@
+{
+
+  "project_info" : {
+    "version" : "0.2",
+    "author" : "JAGB"
+  },
+
+  "agents" : {
+    "AgentOne" : "./Bots/Tyrion.json",
+    "AgentTwo" : "./Bots/JohnSnow.json"
+  },
+
+  "knowledge" : {
+      "corpus_path":"./",
+      "use_knowledge" : true,
+      "save_corpus" : false
+  },
+
+  "params" : {
+    "n_offers" : 1,
+    "show_offers" : false,
+    "first_random" : true
+  }
+
+}

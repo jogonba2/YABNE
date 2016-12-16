@@ -1,0 +1,89 @@
+
+
+																  ____  _____    _    ____  __  __ _____ 
+																 |  _ \| ____|  / \  |  _ \|  \/  | ____|
+																 | |_) |  _|   / _ \ | | | | |\/| |  _|  
+																 |  _ <| |___ / ___ \| |_| | |  | | |___ 
+																 |_| \_\_____/_/   \_\____/|_|  |_|_____|
+                                         
+
+
+
+
+************************************************************ Entorno de negociación automática bilateral (SMA) ************************************************************
+
+
+************************************************************					INFO						   ************************************************************
+
+· Entorno de negociación automática bilateral desarrollado para la asignatura Sistemas Multiagente (IARFID - DSIC) que facilita el desarrollo de agentes negociadores.
+  Se proporcionan funciones de utilidad, estrategias de concesión, criterios de aceptación, métodos de generación de ofertas y modelos de aprendizaje automático
+  para predecir la respuesta del contrario ante una oferta:
+  
+  · Funciones de utilidad:
+	· Lineal
+	
+  · Estrategias de concesión:
+	· Temporal
+	· No concesión
+	· Aleatoria
+	· Toma y daca relativo
+	· Toma y daca absoluto
+	· Toma y daca promediado
+
+  · Criterios de aceptación:
+	· Racional
+	· Aleatorio
+	
+  · Generación de ofertas:
+	· Aleatorio
+	· Genético
+
+  · Clasificadores (scikit-learn)
+    · Multilayer Perceptron
+    · Naive Bayes (Gaussian)
+    · Naive Bayes (Multinomial)
+    · Naive Bayes (Bernoulli)
+    · SVM
+    · Decision trees
+    · Random forest
+    · Adaboost
+    · K nearest neighbors
+    · Nearest centroid
+    
+    Los agentes se definen ficheros json dentro del directorio ./Bots, cualquier código adicional que se requiera se puede añadir en los scripts Offers, Utility,
+    Concession, Utils, Acceptante o Classifier. Se proporcionan dos agentes de ejemplo (Tyrion.json y JohnSnow.json) en el directorio ./Bots
+    
+************************************************************					BUGS						   ************************************************************
+
+· Se han observado fallos con el algoritmo genético de generación de ofertas con conocimiento del oponente. Esto ocurre por los parámetros del algoritmo genético (es demasiado elitista) y
+  se queda estancado en ofertas que el oponente va a aceptar. Se observa como si el número de individuos a evaluar usando conocimiento es muy bajo, se comporta correctamente. Si se evalúa de esta forma
+  sobre demasiados individuos puede quedar estancado.
+  
+· El algoritmo genético no asegura que la utilidad de la oferta generada supere al valor de aspiración, pero en las pruebas realizadas se comporta bien si no se usa conocimiento del oponente.
+
+
+************************************************************					TIPS						   ************************************************************
+
+· En la definición de los valores de los atributos categóricos, usar enteros si se quiere usar conocimiento del oponente, en el ejemplo:
+
+     color : 0 - green, 1 - blue, 2 - red
+     abs : 0 - no, 1 - yes
+     
+· Si se quiere usar conocimiento del oponente, en la primera negociación entre los dos agentes se debe desactivar el parámetro use_knowledge. Así se guardará información sobre las ofertas
+  de cada agente y podrá ser usada en negociaciones posteriores.
+  
+· Si se usa la generación de ofertas con genético y conocimiento del oponente, hay que poner upper_bound_knowledge a |population|*(epochs-x) con x>0.
+  El significado es que se incrementa el contador (hasta upper_bound_knowledge) en 1 para cada individuo, por lo que el número máximo de iteraciones
+  debe ser el número de individuos que se quieren evaluar, a partir de los cuales no se tendrá en cuenta conocimiento del oponente. Por defecto, |population| = 50 y epochs=20.
+
+************************************************************					TODO						   ************************************************************
+
+· Parametrización del método genético de generación de ofertas y de los clasificadores.
+· Interfaz gráfico.
+
+************************************************************					ABOUT						   ************************************************************
+
+· Contacto: jogonba2@dsic.upv.es
+
+
+***************************************************************************************************************************************************************************

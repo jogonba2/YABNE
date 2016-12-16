@@ -1,3 +1,5 @@
+""" Add here your acceptance methods """
+
 from random import uniform
 
 class Acceptance:

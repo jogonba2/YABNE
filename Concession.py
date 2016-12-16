@@ -1,3 +1,5 @@
+""" Add here your concession methods """
+
 from random import uniform
 
 class Concession:

@@ -1,3 +1,4 @@
+""" Add here your utility methods """
 
 class Utility:
 

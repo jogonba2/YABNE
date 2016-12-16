@@ -3,14 +3,19 @@ from Utility import Utility
 from Concession import Concession
 from Acceptance import Acceptance
 from Offers import Offers
+from Classifiers import Classifiers
+
+from pickle import load
 
 class Agent:
 
     def __init__(self, definition_json):
         definition_json = Utils.load_json(definition_json)
-        self.agent_name = definition_json["agent_name"]
-        self.agent_gender = definition_json["agent_gender"]
-        self.agent_country = definition_json["agent_country"]
+        self.agent_name = definition_json["agent_info"]["name"]
+        self.agent_gender = definition_json["agent_info"]["gender"]
+        self.agent_country = definition_json["agent_info"]["country"]
+        self.agent_birthday = definition_json["agent_info"]["birthday"]
+        self.agent_reputation = definition_json["agent_info"]["reputation"]
         self.attributes = definition_json["attributes"]
         self.revoke_step = definition_json["revoke_step"]
         self.weights_attr = definition_json["weights_attr"]
@@ -23,8 +28,16 @@ class Agent:
         self.utility_type = getattr(Utility, definition_json["utility_type"])
         self.acceptance_type = getattr(Acceptance, definition_json["acceptance_type"])
         self.offer_type = getattr(Offers, definition_json["offer_type"])
+        self.ml_type = getattr(Classifiers, definition_json["ml_model"])
+        self.oponent_model = None
         self.memory_proposal_offers = []
         self.memory_received_offers = []
+        self.t = 0
+        self.accepted_offers = []
+        self.revoked_offers = []
+        self.oponent_agent = None
+        self.using_oponent_knowledge = definition_json["agent_info"]["using_oponent_knowledge"]
+        self.upper_bound_knowledge = definition_json["upper_bound_knowledge"]
 
     def emit_offer(self):
         space = {}
@@ -36,8 +49,13 @@ class Agent:
             elif self.attributes[attr]=="categorical":
                 space[attr] = (self.attributes[attr],
                                self.values_attr[self.attributes[attr]][attr]["properties"]["choices"])
-        offer, utility = self.offer_type(space, self.s, self.utility_type, self.attributes, self.weights_attr, self.values_attr)
+        offer = None
+        utility = float("-inf")
+        offer, utility = self.offer_type(space, self.s, self.utility_type, self.attributes, self.weights_attr,
+                                         self.values_attr, self.using_oponent_knowledge,self.oponent_model, self.t,
+                                         self.upper_bound_knowledge)
         self.memory_proposal_offers.append(utility)
+        self.accepted_offers.append([offer, self.t, 1])
         return offer
 
     def emit_n_offers(self, n):
@@ -52,8 +70,12 @@ class Agent:
             if res_utilities[i]>=max_utility: max_utility, pos_max_utility = res_utilities[i], i
         self.memory_received_offers += res_utilities
         accept = self.acceptance_type(max_utility, self.s)
-        if accept: return offers[pos_max_utility]
-        else: return False
+        if accept:
+            self.accepted_offers.append([offers[pos_max_utility], self.t, 1])
+            return offers[pos_max_utility]
+        else:
+            self.revoked_offers.append([offers[pos_max_utility], self.t, 0])
+            return False
 
     # Solo cuando se lleven \delta+1 iteración se cambiará. Se parte inicialmente de concesión temporal #
     def update_s(self, t):
@@ -77,12 +99,6 @@ class Agent:
     def get_benefits(self, offer):
         return self.utility_type(self.attributes, self.weights_attr, self.values_attr, offer)
 
-    def train_oponent_model(self):
-        pass
-
-    def predict_oponent_model(self):
-        pass
-
     def ready(self, t):
         return t<self.revoke_step
 
@@ -101,11 +117,26 @@ class Agent:
     def get_s(self):
         return self.s
 
+    def get_knowledge(self):
+        return self.accepted_offers+self.revoked_offers
+
+    def set_t(self, t): self.t = t
+
     def get_memory_proposal_offers(self):
         return self.memory_proposal_offers
 
     def get_memory_received_offers(self):
         return self.memory_received_offers
+
+    def set_oponent(self, oponent_agent): self.oponent_agent = oponent_agent
+
+    def load_oponent_knowledge(self, dump_file):
+        with open(dump_file, "rb") as fd:
+            oponent_knowledge = load(fd)
+            #print("Para el agente: ",self.agent_name+" conocimiento sobre: ",self.oponent_agent+": "+str(oponent_knowledge[0:5]))
+            X, Y = Utils.convert_knowledge_to_samples(oponent_knowledge)
+            self.oponent_model = self.ml_type(X, Y)
+
 
 if __name__ == "__main__":
     tyrion = Agent(definition_json="./Bots/Tyrion.json")

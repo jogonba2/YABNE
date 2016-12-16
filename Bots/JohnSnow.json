@@ -1,9 +1,13 @@
 {
-    "agent_name" : "JohnSnow",
-
-    "agent_gender" : "male",
-
-    "agent_country" : "spanish",
+    "agent_info" : {
+      "name": "JohnSnow",
+      "gender": "male",
+      "country": "spain",
+      "birthday": "16/08/94",
+      "reputation": 0.8,
+      "using_oponent_knowledge":true,
+      "domain" : "car sale"
+    },
 
     "attributes" : {"price" : "integer", "color": "categorical", "abs": "categorical"},
 
@@ -33,21 +37,21 @@
 		"categorical" : {
 			"color" : {
                 "properties" : {
-                  "choices" : ["blue", "green", "red"]
+                  "choices" : [0, 1, 2]
                 },
                 "conditions" : {
-				    "cond_1" : ["blue", 0.1],
-				    "cond_2" : ["green", 0.5],
-				    "cond_3" : ["red", 1]
+				    "cond_1" : [0, 0.1],
+				    "cond_2" : [1, 0.5],
+				    "cond_3" : [2, 1]
                 }
 			},
 			"abs" : {
                 "properties" : {
-                    "choices" : ["yes", "no"]
+                    "choices" : [0, 1]
                 },
                 "conditions" : {
-				    "cond_1" : ["yes", 1],
-				    "cond_2" : ["no" , 0]
+				    "cond_1" : [1, 1],
+				    "cond_2" : [0 , 0]
                 }
 			}
 		}
@@ -62,13 +66,17 @@
 
     "delta" : 2,
 
-    "beta" : 0.5,
+    "beta" : 0.8,
 
-    "concession_type" : "behavioural_absolute_concession",
+    "concession_type" : "temporal_concession",
 
     "acceptance_type" : "rational",
 
     "offer_type" : "random_offer",
 
-    "s" : 1
+    "s" : 0.9,
+
+    "ml_model" : "mlp_nn_classifier",
+
+    "upper_bound_knowledge" : 200
 }

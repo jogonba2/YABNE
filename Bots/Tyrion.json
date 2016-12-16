@@ -1,9 +1,13 @@
 {
-    "agent_name" : "Tyrion",
-
-    "agent_gender" : "male",
-
-    "agent_country" : "spanish",
+    "agent_info" : {
+      "name": "Tyrion",
+      "gender": "male",
+      "country": "spain",
+      "birthday": "16/08/91",
+      "reputation": 0.3,
+      "using_oponent_knowledge" : true,
+      "domain" : "car sale"
+    },
 
     "attributes" : {"price" : "integer", "color": "categorical", "abs": "categorical"},
 
@@ -29,26 +33,25 @@
                 }
 			}
 		},
-
 		"float"       : {},
 		"categorical" : {
 			"color" : {
                 "properties" : {
-                  "choices" : ["blue", "green", "red"]
+                  "choices" : [0, 1, 2]
                 },
                 "conditions" : {
-				    "cond_1" : ["blue", 0.4],
-				    "cond_2" : ["green", 0.1],
-				    "cond_3" : ["red", 1]
+				    "cond_1" : [0, 0.4],
+				    "cond_2" : [1, 0.1],
+				    "cond_3" : [2, 1]
                 }
 			},
 			"abs" : {
                 "properties" : {
-                    "choices" : ["yes", "no"]
+                    "choices" : [0, 1]
                 },
                 "conditions" : {
-				    "cond_1" : ["yes", 1],
-				    "cond_2" : ["no" , 0]
+				    "cond_1" : [1, 1],
+				    "cond_2" : [0 , 0]
                 }
 			}	
 		}
@@ -71,5 +74,9 @@
 
     "offer_type" : "genetic_offer",
 
-    "s" : 1
+    "s" : 0.9,
+
+    "ml_model" : "mlp_nn_classifier",
+
+    "upper_bound_knowledge" : 1
 }

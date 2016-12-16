@@ -1,13 +1,17 @@
+""" Add here your methods for generate offers """
+
 from random import randint, uniform, choice
 from deap import base, creator, tools, algorithms
-from Utility import Utility
+from Utils import Utils
 
 class Offers:
 
     # space = {(attr_1, space_1), (attr_2, space_2), ...,(attr_n, space_n) : space_i \in {(int, min, max), (float, min, max), (str, list)}} #
     @staticmethod
-    def random_offer(space, s, utility_function, attributes, weights_attr, values_attr):
+    def random_offer(space, s, utility_function, attributes, weights_attr, values_attr, use_knowledge, ml_model, t, upper_bound_knowledge):
         act_s = 0
+        # Regular cuantas ofertas generar usando conocimiento, si se supera upper_bound se deja de tener en cuenta que el adversario acepte o no la oferta #
+        iters = 0
         while act_s<s:
             res = {}
             for key in space:
@@ -15,13 +19,20 @@ class Offers:
                 elif space[key][0]=="float": res[key] = uniform(space[key][1], space[key][2]+1)
                 elif space[key][0]=="categorical": res[key] = choice(space[key][1])
             act_s = utility_function(attributes, weights_attr, values_attr, res)
+            if use_knowledge and iters<upper_bound_knowledge:
+                x = Utils.convert_knowledge_to_sample_test(res, t)
+                oponent_accepts = ml_model.predict([x])[0]
+                if oponent_accepts==0:
+                    act_s = float("-inf")
+            iters += 1
         return res, act_s
 
     # Only with int attributes #
     @staticmethod
-    def genetic_offer(space, s, utility_function, attributes, weights_attr, values_attr, pob_size=50,
-                      prob_mutate=0.3, prob_mating=0.4, iterations=20, tournsize=3):
+    def genetic_offer(space, s, utility_function, attributes, weights_attr, values_attr, use_knowledge,
+                      ml_model, t, upper_bound_knowledge, pob_size=50, prob_mutate=0.3, prob_mating=0.4, iterations=30, tournsize=2):
 
+        iters = 0
         def transform(ind, categorical_dims, index_int_2_cat, number_dims):
             h_ind = {}
 
@@ -37,11 +48,19 @@ class Offers:
 
             return h_ind
 
-        def f_eval(ind, categorical_dims, index_int_2_cat, number_dims):
+        def f_eval(ind, categorical_dims, index_int_2_cat, number_dims, iters, use_knowledge,
+                   ml_model, t, upper_bound_knowledge):
+
+            iters += 1
             try:
                 h_ind = transform(ind, categorical_dims, index_int_2_cat, number_dims)
                 utility = utility_function(attributes, weights_attr, values_attr, h_ind)
-                diff = s - utility
+                diff = s - utility # (s - utility) * other_dealer_accept
+                if use_knowledge and iters<upper_bound_knowledge:
+                    x = Utils.convert_knowledge_to_sample_test(h_ind, t)
+                    oponent_accepts = ml_model.predict([x])[0]
+                    if oponent_accepts == 0:
+                        return float("inf"),
                 return diff,
             except:
                 return float("inf"),
@@ -104,7 +123,10 @@ class Offers:
             population.append(creator.Individual(individual))
 
         toolbox.register("evaluate", f_eval, categorical_dims=categorical_dims,
-                         index_int_2_cat=index_int_2_cat, number_dims=number_dims)
+                         index_int_2_cat=index_int_2_cat, number_dims=number_dims, iters=iters,
+                         use_knowledge=use_knowledge, ml_model=ml_model, t=t,
+                         upper_bound_knowledge=upper_bound_knowledge)
+
         toolbox.register("mate", mate)
         toolbox.register("mutate", mutate, values_attr=values_attr, number_dims=number_dims,
                          categorical_dims=categorical_dims)
