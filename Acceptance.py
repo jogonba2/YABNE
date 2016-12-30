@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 """ Add here your acceptance methods """
 
 from random import uniform

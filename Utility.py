@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 """ Add here your utility methods """
 
 class Utility:
@@ -8,7 +12,6 @@ class Utility:
         for item in offer:
             value_item = offer[item]
             type_item = attributes[item]
-
             for condition in values_attrs[type_item][item]["conditions"]:
                 if type_item=="integer" or type_item=="float":
                     left_bound = values_attrs[type_item][item]["conditions"][condition][0]

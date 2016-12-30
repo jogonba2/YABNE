@@ -1,16 +1,5 @@
-
-
-																  ____  _____    _    ____  __  __ _____ 
-																 |  _ \| ____|  / \  |  _ \|  \/  | ____|
-																 | |_) |  _|   / _ \ | | | | |\/| |  _|  
-																 |  _ <| |___ / ___ \| |_| | |  | | |___ 
-																 |_| \_\_____/_/   \_\____/|_|  |_|_____|
-                                         
-
-
-
-
 ************************************************************ Entorno de negociación automática bilateral (SMA) ************************************************************
+
 
 
 ************************************************************					INFO						   ************************************************************
@@ -52,6 +41,7 @@
     
     Los agentes se definen ficheros json dentro del directorio ./Bots, cualquier código adicional que se requiera se puede añadir en los scripts Offers, Utility,
     Concession, Utils, Acceptante o Classifier. Se proporcionan dos agentes de ejemplo (Tyrion.json y JohnSnow.json) en el directorio ./Bots
+
     
 ************************************************************					BUGS						   ************************************************************
 
@@ -71,19 +61,22 @@
      
 · Si se quiere usar conocimiento del oponente, en la primera negociación entre los dos agentes se debe desactivar el parámetro use_knowledge. Así se guardará información sobre las ofertas
   de cada agente y podrá ser usada en negociaciones posteriores.
-  
-· Si se usa la generación de ofertas con genético y conocimiento del oponente, hay que poner upper_bound_knowledge a |population|*(epochs-x) con x>0.
-  El significado es que se incrementa el contador (hasta upper_bound_knowledge) en 1 para cada individuo, por lo que el número máximo de iteraciones
-  debe ser el número de individuos que se quieren evaluar, a partir de los cuales no se tendrá en cuenta conocimiento del oponente. Por defecto, |population| = 50 y epochs=20.
+
+
+************************************************************					VERSION						   ************************************************************
+
+· (0.3) Arreglado un bug con el uso de aprendizaje en la generación de ofertas.
+· (0.3) Añadido torneo.
+· (0.3) Añadidas estadísticas de torneo.
+· (0.3) Añadido setup.py
 
 ************************************************************					TODO						   ************************************************************
 
 · Parametrización del método genético de generación de ofertas y de los clasificadores.
-· Interfaz gráfico.
+
 
 ************************************************************					ABOUT						   ************************************************************
 
-· Contacto: jogonba2@dsic.upv.es
-
+· Contacto: jogonba2@dsic.upv.es 
 
 ***************************************************************************************************************************************************************************

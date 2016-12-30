@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 """ Add here your classifiers (scikit-learn convention) """
 
 from sklearn.neural_network import MLPClassifier
@@ -36,7 +40,7 @@ class Classifiers:
         return clf
 
     @staticmethod
-    def random_forest(X, Y, n_stimators=10):
+    def random_forest(X, Y, n_estimators=10):
         clf = RandomForestClassifier(n_estimators=n_estimators)
         clf.fit(X, Y)
         return clf

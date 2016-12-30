@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 """ Add here your stuff """
 
 from random import shuffle
-from numpy import array
 import json
-
 
 class Utils:
 
@@ -20,15 +22,6 @@ class Utils:
     def load_json(json_file):
         with open(json_file) as fd:
             return json.load(fd)
-
-    @staticmethod
-    def register_corpus(offers, dealer_one_values_attr, dealer_two_values_attr):
-        h = {}
-        for offer_register in offers:
-            if offer_register[0] not in h:
-                h[offer_register[0]] = []
-                for offer in offer_register:
-                    continue
 
     @staticmethod
     def convert_knowledge_to_samples(offers):

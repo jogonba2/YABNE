@@ -1,9 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 from Utils import Utils
 from Utility import Utility
 from Concession import Concession
 from Acceptance import Acceptance
 from Offers import Offers
 from Classifiers import Classifiers
+from Messages import Messages
 
 from pickle import load
 
@@ -11,33 +16,57 @@ class Agent:
 
     def __init__(self, definition_json):
         definition_json = Utils.load_json(definition_json)
-        self.agent_name = definition_json["agent_info"]["name"]
-        self.agent_gender = definition_json["agent_info"]["gender"]
-        self.agent_country = definition_json["agent_info"]["country"]
-        self.agent_birthday = definition_json["agent_info"]["birthday"]
-        self.agent_reputation = definition_json["agent_info"]["reputation"]
-        self.attributes = definition_json["attributes"]
-        self.revoke_step = definition_json["revoke_step"]
-        self.weights_attr = definition_json["weights_attr"]
-        self.values_attr = definition_json["values_attr"]
-        self.ur = definition_json["ur"]
-        self.delta = definition_json["delta"]
-        self.beta  = definition_json["beta"]
-        self.s = definition_json["s"]
-        self.concession_type = getattr(Concession, definition_json["concession_type"])
-        self.utility_type = getattr(Utility, definition_json["utility_type"])
-        self.acceptance_type = getattr(Acceptance, definition_json["acceptance_type"])
-        self.offer_type = getattr(Offers, definition_json["offer_type"])
-        self.ml_type = getattr(Classifiers, definition_json["ml_model"])
-        self.oponent_model = None
-        self.memory_proposal_offers = []
-        self.memory_received_offers = []
-        self.t = 0
-        self.accepted_offers = []
-        self.revoked_offers = []
-        self.oponent_agent = None
-        self.using_oponent_knowledge = definition_json["agent_info"]["using_oponent_knowledge"]
-        self.upper_bound_knowledge = definition_json["upper_bound_knowledge"]
+        self.valid = self.__is_valid(definition_json)
+        if self.valid==True:
+            self.agent_name = self.__load_field(definition_json["agent_info"], "name")
+            self.agent_gender = self.__load_field(definition_json["agent_info"], "gender")
+            self.agent_country = self.__load_field(definition_json["agent_info"], "country")
+            self.agent_birthday = self.__load_field(definition_json["agent_info"], "birthday")
+            self.agent_reputation = self.__load_field(definition_json["agent_info"], "reputation")
+            self.description = self.__load_field(definition_json["agent_info"], "description")
+            self.attributes = self.__load_field(definition_json, "attributes")
+            self.revoke_step = self.__load_field(definition_json, "revoke_step")
+            self.weights_attr = self.__load_field(definition_json, "weights_attr")
+            self.values_attr = self.__load_field(definition_json, "values_attr")
+            self.ur = self.__load_field(definition_json, "ur")
+            self.delta = self.__load_field(definition_json, "delta")
+            self.beta  = self.__load_field(definition_json, "beta")
+            self.s = self.__load_field(definition_json, "s")
+            self.window_offer = self.__load_field(definition_json, "window_offer")
+            self.concession_type = getattr(Concession, self.__load_field(definition_json, "concession_type"))
+            self.utility_type = getattr(Utility, self.__load_field(definition_json, "utility_type"))
+            self.acceptance_type = getattr(Acceptance, self.__load_field(definition_json, "acceptance_type"))
+            self.offer_type = getattr(Offers, self.__load_field(definition_json, "offer_type"))
+            try: self.ml_type = getattr(Classifiers, self.__load_field(definition_json, "ml_model"))
+            except: pass
+            self.oponent_model = None
+            self.memory_proposal_offers = []
+            self.memory_received_offers = []
+            self.t = 0
+            self.accepted_offers = []
+            self.revoked_offers = []
+            self.oponent_agent = None
+            self.using_oponent_knowledge = self.__load_field(definition_json["agent_info"], "using_oponent_knowledge")
+            self.upper_bound_knowledge = self.__load_field(definition_json, "upper_bound_knowledge")
+
+    def __is_valid(self, definition_json):
+        if not "agent_info" in definition_json: return "agent_info"
+        if not "attributes" in definition_json: return "attributes"
+        if not "revoke_step" in definition_json: return "revoke_step"
+        if not "weights_attr" in definition_json: return "weights_attr"
+        if not "values_attr" in definition_json: return "values_attr"
+        if not "ur" in definition_json: return "ur"
+        if not "s" in definition_json: return "s"
+        if not "concession_type" in definition_json: return "concession_type"
+        if not "utility_type" in definition_json: return "utility_type"
+        if not "acceptance_type" in definition_json: return "acceptance_type"
+        if not "offer_type" in definition_json: return "offer_type"
+        if not "using_oponent_knowledge" in definition_json["agent_info"]: return "using_oponent_knowledge"
+        return True
+
+    def __load_field(self, field, attribute):
+        if attribute in field: return field[attribute]
+        return None
 
     def emit_offer(self):
         space = {}
@@ -49,9 +78,9 @@ class Agent:
             elif self.attributes[attr]=="categorical":
                 space[attr] = (self.attributes[attr],
                                self.values_attr[self.attributes[attr]][attr]["properties"]["choices"])
-        offer = None
-        utility = float("-inf")
-        offer, utility = self.offer_type(space, self.s, self.utility_type, self.attributes, self.weights_attr,
+        #print(self.agent_name+","+str(self.s)+","+str(self.window_offer)+","+str(self.s+self.window_offer))
+        max_range = min(1, (self.s + self.window_offer)) if self.window_offer != None else 1
+        offer, utility = self.offer_type(space, self.s, max_range, self.utility_type, self.attributes, self.weights_attr,
                                          self.values_attr, self.using_oponent_knowledge,self.oponent_model, self.t,
                                          self.upper_bound_knowledge)
         self.memory_proposal_offers.append(utility)
@@ -80,16 +109,16 @@ class Agent:
     # Solo cuando se lleven \delta+1 iteración se cambiará. Se parte inicialmente de concesión temporal #
     def update_s(self, t):
         if self.concession_type==Concession.temporal_concession:
-            self.s = self.concession_type(t, self.ur, self.beta, self.revoke_step)
+            self.s = self.concession_type(t, self.ur, self.beta, self.revoke_step, self.s)
 
         elif self.concession_type == Concession.behavioural_relative_concession or \
              self.concession_type == Concession.behavioural_absolute_concession or \
              self.concession_type == Concession.behavioural_averaged_concession:
 
             if t<=self.delta*2:
-                self.s = Concession.temporal_concession(t, self.ur, self.beta, self.revoke_step)
+                self.s = Concession.temporal_concession(t, self.ur, self.beta, self.revoke_step, self.s)
             else:
-                self.s = self.concession_type(t, self.ur, self.memory_proposal_offers, self.memory_received_offers, self.delta)
+                self.s = self.concession_type(t, self.ur, self.memory_proposal_offers, self.memory_received_offers, self.delta, self.s)
 
         elif self.concession_type==Concession.non_concession() or \
              self.concession_type==Concession.random_concession():
@@ -99,11 +128,16 @@ class Agent:
     def get_benefits(self, offer):
         return self.utility_type(self.attributes, self.weights_attr, self.values_attr, offer)
 
+    def get_valid(self): return self.valid
+
     def ready(self, t):
         return t<self.revoke_step
 
     def get_name(self):
         return self.agent_name
+
+    def get_using_knowledge(self):
+        return self.using_oponent_knowledge
 
     def get_weights_attr(self):
         return self.weights_attr
@@ -116,6 +150,9 @@ class Agent:
 
     def get_s(self):
         return self.s
+
+    def get_window_offer(self):
+        return self.window_offer
 
     def get_knowledge(self):
         return self.accepted_offers+self.revoked_offers

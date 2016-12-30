@@ -5,8 +5,9 @@
       "country": "spain",
       "birthday": "16/08/94",
       "reputation": 0.8,
-      "using_oponent_knowledge":true,
-      "domain" : "car sale"
+      "description" : "john snow, interested in ...",
+      "using_oponent_knowledge" : true,
+      "domain" : "car_sale"
     },
 
     "attributes" : {"price" : "integer", "color": "categorical", "abs": "categorical"},
@@ -34,6 +35,7 @@
 		},
 
 		"float"       : {},
+
 		"categorical" : {
 			"color" : {
                 "properties" : {
@@ -55,7 +57,6 @@
                 }
 			}
 		}
-
 	},
 
     "utility_type" : "linear",
@@ -72,11 +73,13 @@
 
     "acceptance_type" : "rational",
 
-    "offer_type" : "random_offer",
+    "offer_type" : "hyperopt_offer",
 
-    "s" : 0.9,
+    "s" : 0.7,
+
+    "window_offer" : 0.1,
 
     "ml_model" : "mlp_nn_classifier",
 
-    "upper_bound_knowledge" : 200
+    "upper_bound_knowledge" : 500
 }

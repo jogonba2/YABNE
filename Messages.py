@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 from time import sleep
 
 class Messages:
@@ -42,3 +46,37 @@ class Messages:
     @staticmethod
     def header():
         print("\n")
+
+    @staticmethod
+    def bilateral():
+        return " *************\n * Bilateral * \n ************* \n\n"
+
+    @staticmethod
+    def tournament():
+        return " **************\n * Tournament * \n ************** \n\n"
+
+    @staticmethod
+    def tournament_statistics(statistics):
+        res = "*** Tournament statistics *** \n\n"
+        for agent in statistics:
+            res += agent + " : \n\n"
+            for stat in statistics[agent]:
+                res += "\t · " + stat[0] + " : " + str(stat[1]) + "\n"
+            res += "\n"
+        return res
+
+    @staticmethod
+    def tournament_round(i, agent_one_name, agent_two_name):
+        return "Round %i : %s - %s\n" % (i, agent_one_name, agent_two_name)
+
+    @staticmethod
+    def less_two_agents():
+        return "At least two agents.\n"
+
+    @staticmethod
+    def installing(package):
+        return "Installing %s ..." % (package)
+
+    @staticmethod
+    def agent_definition_error(name, error):
+        return "Error in agent %s definition, field %s is not defined" % (name, error)

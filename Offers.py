@@ -1,36 +1,129 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 """ Add here your methods for generate offers """
 
 from random import randint, uniform, choice
 from deap import base, creator, tools, algorithms
 from Utils import Utils
+from scipy.optimize import minimize
+from hyperopt import fmin, hp, tpe
 
 class Offers:
 
+    """ Pendiente implementar conocimiento del oponente """
+    @staticmethod
+    def hyperopt_offer(space, s, max_range, utility_function, attributes, weights_attr, values_attr, use_knowledge, ml_model, t, upper_bound_knowledge, max_eval=30):
+
+        def f_obj(x):
+            act_s = utility_function(attributes, weights_attr, values_attr, x)
+            if act_s<s or max_range<act_s: return float("inf")
+            return -act_s
+
+        def hyperopt_space(space):
+            hp_space = {}
+            for key in space:
+                if space[key][0]=="categorical":
+                    hp_space[key] = hp.choice(key, space[key][1])
+                elif space[key][0]=="integer":
+                    hp_space[key] = hp.quniform(key, space[key][1], space[key][2], 1)
+                elif space[key][0]=="float":
+                    hp_space[key] = hp.uniform(key, space[key][1], space[key][2])
+            return hp_space
+
+        hp_space = hyperopt_space(space)
+        act_s = float("inf")
+        best = None
+        while act_s<s or max_range<act_s:
+            best = fmin(f_obj,
+                        space=hp_space,
+                        algo=tpe.suggest,
+                        max_evals=max_eval)
+            act_s = utility_function(attributes, weights_attr, values_attr, best)
+        return best, act_s
+
+
+    """ Queda pendiente la implementación del metodo."""
+    @staticmethod
+    def scipy_offer(space, s, max_range, utility_function, attributes, weights_attr, values_attr, use_knowledge, ml_model, t, upper_bound_knowledge):
+        def f(x, space, attributes, weights_attr, values_attr, max_values):
+            res = unnorm_x(space, x, max_values)
+            act_s = utility_function(attributes, weights_attr, values_attr, res)
+            return -act_s
+
+        def unnorm_x(space, x, max_values):
+            res = {}
+            i = 0
+            for val in space:
+                res[val] = x[i] * max_values[i]
+                i += 1
+            return res
+
+        def get_bounds(space):
+            bnds = []
+            for val in space:
+                if space[val][0]=="integer" or space[val][0]=="float":
+                    bnds.append((space[val][1], space[val][2]))
+                elif space[val][0]=="categorical":
+                    bnds.append((space[val][1][0], space[val][1][-1]))
+            return bnds
+
+        def generate_initial_guess(space):
+            r = []
+            for key in space:
+                if space[key][0]=="integer": r.append(uniform(int(space[key][1]), int(space[key][2]+1)))
+                elif space[key][0]=="float": r.append(uniform(space[key][1], space[key][2]+1))
+                elif space[key][0]=="categorical": r.append(choice(space[key][1]))
+            return r
+
+        def norm_space(space):
+            max_values = [] # Para reconstruir la oferta
+            for val in space:
+                if space[val][0]=="integer" or space[val][0]=="float":
+                    type = space[val][0]
+                    lower_bound = space[val][1] / space[val][2]
+                    upper_bound = space[val][2] / space[val][2]
+                    space[val] = (type, lower_bound, upper_bound)
+                    max_values.append(upper_bound)
+                elif space[val][0]=="categorical":
+                    for i in range(len(space[val][1])):
+                        space[val][1][i] = space[val][1][i] / space[val][1][-1]
+                        max_values.append(space[val][1][-1])
+            return max_values, space
+
+        max_values, space = norm_space(space)
+        x = generate_initial_guess(space)
+        bnds = get_bounds(space)
+        res = minimize(f, x, args=(space, attributes, weights_attr, values_attr, max_values), method='L-BFGS-B', options={"maxiter":100000}, bounds=bnds, tol=10e-16)
+        return list(res["x"]), unnorm_x(space, res["x"], max_values)
+
     # space = {(attr_1, space_1), (attr_2, space_2), ...,(attr_n, space_n) : space_i \in {(int, min, max), (float, min, max), (str, list)}} #
     @staticmethod
-    def random_offer(space, s, utility_function, attributes, weights_attr, values_attr, use_knowledge, ml_model, t, upper_bound_knowledge):
+    def random_offer(space, s, max_range, utility_function, attributes, weights_attr, values_attr, use_knowledge, ml_model, t, upper_bound_knowledge):
         act_s = 0
-        # Regular cuantas ofertas generar usando conocimiento, si se supera upper_bound se deja de tener en cuenta que el adversario acepte o no la oferta #
+        # Regular cuantas ofertas (que superen el nivel de aspiración) generar usando conocimiento,
+        # si se supera upper_bound se deja de tener en cuenta que el adversario acepte o no la oferta #
         iters = 0
-        while act_s<s:
+        while act_s<s or max_range<act_s:
             res = {}
             for key in space:
                 if space[key][0]=="integer": res[key] = randint(int(space[key][1]), int(space[key][2]+1))
                 elif space[key][0]=="float": res[key] = uniform(space[key][1], space[key][2]+1)
                 elif space[key][0]=="categorical": res[key] = choice(space[key][1])
             act_s = utility_function(attributes, weights_attr, values_attr, res)
-            if use_knowledge and iters<upper_bound_knowledge:
-                x = Utils.convert_knowledge_to_sample_test(res, t)
-                oponent_accepts = ml_model.predict([x])[0]
-                if oponent_accepts==0:
-                    act_s = float("-inf")
-            iters += 1
+            if s<=act_s and act_s<=max_range:
+                if use_knowledge and iters<upper_bound_knowledge:
+                    x = Utils.convert_knowledge_to_sample_test(res, t)
+                    oponent_accepts = ml_model.predict([x])[0]
+                    if oponent_accepts==0: act_s = float("-inf")
+                    iters += 1
         return res, act_s
 
     # Only with int attributes #
     @staticmethod
-    def genetic_offer(space, s, utility_function, attributes, weights_attr, values_attr, use_knowledge,
-                      ml_model, t, upper_bound_knowledge, pob_size=50, prob_mutate=0.3, prob_mating=0.4, iterations=30, tournsize=2):
+    def genetic_offer(space, s, max_range, utility_function, attributes, weights_attr, values_attr, use_knowledge,
+                      ml_model, t, upper_bound_knowledge, pob_size=5, prob_mutate=0.3, prob_mating=0.4, iterations=100, tournsize=3):
 
         iters = 0
         def transform(ind, categorical_dims, index_int_2_cat, number_dims):
@@ -56,11 +149,12 @@ class Offers:
                 h_ind = transform(ind, categorical_dims, index_int_2_cat, number_dims)
                 utility = utility_function(attributes, weights_attr, values_attr, h_ind)
                 diff = s - utility # (s - utility) * other_dealer_accept
-                if use_knowledge and iters<upper_bound_knowledge:
-                    x = Utils.convert_knowledge_to_sample_test(h_ind, t)
-                    oponent_accepts = ml_model.predict([x])[0]
-                    if oponent_accepts == 0:
-                        return float("inf"),
+                if s<utility and utility<max_range:
+                    if use_knowledge and iters<upper_bound_knowledge:
+                        x = Utils.convert_knowledge_to_sample_test(h_ind, t)
+                        oponent_accepts = ml_model.predict([x])[0]
+                        if oponent_accepts == 0:
+                            return float("inf"),
                 return diff,
             except:
                 return float("inf"),
@@ -138,6 +232,12 @@ class Offers:
         best = transform(best, categorical_dims, index_int_2_cat, number_dims)
         best_utility = utility_function(attributes, weights_attr, values_attr, best)
         return best, best_utility
+
+    """
+    @staticmethod
+    def annealing_offer(space, s, max_range, utility_function, attributes, weights_attr, values_attr, use_knowledge,
+                      ml_model, t, upper_bound_knowledge, pob_size=5, prob_mutate=0.3, prob_mating=0.4, iterations=100, tournsize=3):
+    """
 
 if __name__ == "__main__":
     """

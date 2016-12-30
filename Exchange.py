@@ -1,38 +1,47 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  Acceptance.py
+
 from Utils import Utils
-from Agent import Agent
 from Messages import Messages
-from json import load
+from Graphics import Graphics
 import pickle
 
 class Exchange:
 
     @staticmethod
     def deal(agent_one, agent_two, first_random=True, n_offers=1, corpus_path="./",
-             use_knowledge=True, save_corpus=False, show_offers=True):
+             save_corpus=False, show_offers=True, show_graphic_process=True, graphic_interactive=False):
 
         dealer_one, dealer_two = Utils.select_first_dealer(agent_one, agent_two, first_random) ; t = 0
         offers_register = []
-
         dealer_one.set_oponent(dealer_two.get_name()) ; dealer_two.set_oponent(dealer_one.get_name())
+        proposal_offers_one_x, proposal_offers_one_y = [], []
+        proposal_offers_two_x, proposal_offers_two_y = [], []
 
         # Entrenar los modelos para cada agente #
-        if use_knowledge:
-            dealer_one.load_oponent_knowledge(corpus_path+"/"+dealer_two.get_name()+".dump")
-            dealer_two.load_oponent_knowledge(corpus_path + "/" + dealer_one.get_name() + ".dump")
+        if dealer_one.get_using_knowledge(): dealer_one.load_oponent_knowledge(corpus_path + "/" + dealer_two.get_name() + ".dump")
+        if dealer_two.get_using_knowledge(): dealer_two.load_oponent_knowledge(corpus_path + "/" + dealer_one.get_name() + ".dump")
 
         while True:
-            print("Step ",t,"...",end="\r")
+            print("Step ",t,"...", end="\r")
             dealer_one.set_t(t)
             dealer_two.set_t(t)
             if t%2==0:
                 offers = dealer_one.emit_n_offers(n_offers)
                 offers_register.append((dealer_one.get_name(), offers))
                 offers_accepted = dealer_two.receive_offers(offers)
+                for offer in offers:
+                    proposal_offers_one_x.append(agent_one.get_benefits(offer))
+                    proposal_offers_one_y.append(agent_two.get_benefits(offer))
 
             else:
                 offers = dealer_two.emit_n_offers(n_offers)
                 offers_register.append((dealer_two.get_name(), offers))
                 offers_accepted = dealer_one.receive_offers(offers)
+                for offer in offers:
+                    proposal_offers_two_x.append(agent_one.get_benefits(offer))
+                    proposal_offers_two_y.append(agent_two.get_benefits(offer))
 
             if offers_accepted:
                 dealer_accept = dealer_two if t%2==0 else dealer_one
@@ -69,21 +78,20 @@ class Exchange:
         if show_offers: print(Messages.show_offers(offers_register))
 
 
-if __name__ == "__main__":
-    with open("./config.json", "r") as fd:
-        config_file = load(fd)
-        agent_one = Agent(definition_json=config_file["agents"]["AgentOne"])
-        agent_two = Agent(definition_json=config_file["agents"]["AgentTwo"])
-        corpus_path = config_file["knowledge"]["corpus_path"]
-        use_knowledge = config_file["knowledge"]["use_knowledge"]
-        save_corpus = config_file["knowledge"]["save_corpus"]
-        n_offers = config_file["params"]["n_offers"]
-        show_offers = config_file["params"]["show_offers"]
-        first_random = config_file["params"]["first_random"]
-        version = config_file["project_info"]["version"]
-        author = config_file["project_info"]["author"]
-        Messages.header()
-        Exchange.deal(agent_one, agent_two, first_random=first_random, n_offers=n_offers, corpus_path=corpus_path,
-                      use_knowledge=use_knowledge, save_corpus=save_corpus, show_offers=show_offers)
-        Messages.footer(version, author)
+        if offers_accepted:
+            if show_graphic_process:
+                accepted_offer = 0 < len(offers_accepted)
+                dealer_proposal = 2 if t % 2 != 0 else 1
+                if graphic_interactive:
+                    Graphics.draw_offers(proposal_offers_one_x, proposal_offers_one_y,
+                                         proposal_offers_two_x, proposal_offers_two_y,
+                                         accepted_offer, dealer_proposal, dealer_one.get_name(),
+                                         dealer_two.get_name())
+                else:
+                    Graphics.draw_offers_all(proposal_offers_one_x, proposal_offers_one_y,
+                                             proposal_offers_two_x, proposal_offers_two_y,
+                                             accepted_offer, dealer_proposal, dealer_one.get_name(),
+                                             dealer_two.get_name())
 
+            return {dealer_one.get_name(): dealer_one.get_benefits(offers_accepted),
+                    dealer_two.get_name(): dealer_two.get_benefits(offers_accepted)}

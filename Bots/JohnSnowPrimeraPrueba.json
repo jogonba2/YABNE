@@ -1,48 +1,49 @@
 {
     "agent_info" : {
-      "name": "Tyrion",
+      "name": "JohnSnowPrimeraPrueba",
       "gender": "male",
       "country": "spain",
-      "birthday": "16/08/91",
-      "reputation": 0.3,
-      "description" : "tyrion, interested in ...",
+      "birthday": "16/08/94",
+      "reputation": 0.8,
+      "description" : "john snow, interested in ...",
       "using_oponent_knowledge" : false,
-      "domain" : "car sale"
+      "domain" : "car_sale"
     },
 
     "attributes" : {"price" : "integer", "color": "categorical", "abs": "categorical"},
 
 	"weights_attr" : {
-		"price" : 0.6,
-		"color" : 0.2,
-		"abs"    : 0.2
+		"price" : 0.8,
+		"color" : 0.1,
+		"abs"    : 0.1
 	},
-	
+
 	"values_attr" : {
 
 		"integer"     : {
 			"price" : {
                 "properties" : {
-                    "max" : 3000,
+                    "max" : 6000,
                     "min" : 0
                 },
                 "conditions" : {
-				    "cond_1" : [0, 1000, 1],
-				    "cond_2" : [1000, 2000, 0.5],
-				    "cond_3" : [2000, 7500, 0.3],
-                    "cond_4" : [7500, Infinity, 0]
+				    "cond_1" : [0, 1000, 0.1],
+				    "cond_2" : [1000, 5000, 0.7],
+				    "cond_3" : [5000, Infinity, 1]
                 }
 			}
 		},
+
 		"float"       : {},
+
 		"categorical" : {
 			"color" : {
                 "properties" : {
                   "choices" : [0, 1, 2]
                 },
                 "conditions" : {
-				    "cond_1" : [0, 0.4],
-				    "cond_2" : [1, 0.1],
+				    "cond_1" : [0, 0.1],
+				    "cond_2" : [1, 0.5],
 				    "cond_3" : [2, 1]
                 }
 			},
@@ -54,9 +55,8 @@
 				    "cond_1" : [1, 1],
 				    "cond_2" : [0 , 0]
                 }
-			}	
+			}
 		}
-
 	},
 
     "utility_type" : "linear",
@@ -73,11 +73,11 @@
 
     "acceptance_type" : "rational",
 
-    "offer_type" : "random_offer",
+    "offer_type" : "hyperopt_offer",
 
-    "s" : 0.9,
+    "s" : 0.7,
 
-    "window_offer" : 0.2,
+    "window_offer" : 0.1,
 
     "ml_model" : "mlp_nn_classifier",
 

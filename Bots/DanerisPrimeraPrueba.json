@@ -1,11 +1,11 @@
 {
     "agent_info" : {
-      "name": "Tyrion",
-      "gender": "male",
+      "name": "Daneris",
+      "gender": "female",
       "country": "spain",
       "birthday": "16/08/91",
       "reputation": 0.3,
-      "description" : "tyrion, interested in ...",
+      "description" : "daneris, interested in ...",
       "using_oponent_knowledge" : false,
       "domain" : "car sale"
     },
@@ -69,17 +69,17 @@
 
     "beta" : 0.8,
 
-    "concession_type" : "temporal_concession",
+    "concession_type" : "behavioural_averaged_concession",
 
     "acceptance_type" : "rational",
 
     "offer_type" : "random_offer",
 
-    "s" : 0.9,
+    "s" : 0.6,
 
-    "window_offer" : 0.2,
+    "window_offer" : 0.1,
 
     "ml_model" : "mlp_nn_classifier",
 
-    "upper_bound_knowledge" : 500
+    "upper_bound_knowledge" : 20
 }

@@ -1,6 +1,6 @@
 {
     "agent_info" : {
-      "name": "Tyrion",
+      "name": "TyrionPrimeraPrueba",
       "gender": "male",
       "country": "spain",
       "birthday": "16/08/91",
@@ -69,11 +69,11 @@
 
     "beta" : 0.8,
 
-    "concession_type" : "temporal_concession",
+    "concession_type" : "behavioural_relative_concession",
 
     "acceptance_type" : "rational",
 
-    "offer_type" : "random_offer",
+    "offer_type" : "hyperopt_offer",
 
     "s" : 0.9,
 
