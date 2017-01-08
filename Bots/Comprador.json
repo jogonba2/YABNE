@@ -1,15 +1,15 @@
 {
     "agent_info" : {
-      "name": "Daneris",
-      "gender": "female",
+      "name": "Comprador1",
+      "gender": "male",
       "country": "spain",
-      "birthday": "16/08/77",
-      "reputation": 0.96,
-      "description" : "daneris, interested in ...",
+      "birthday": "16/08/91",
+      "reputation": 0.3,
+      "description" : "tyrion, interested in ...",
       "domain" : "Product sale"
     },
 
-    "rol" : "Rols/Seller.json",
+    "rol" : "Rols/Buyer.json",
 
     "params" : {
 
@@ -18,7 +18,7 @@
         "revoke_step": 200,
         "s": 0.75,
         "window_offer": 0.1,
-        "use_knowledge" : false,
+        "use_knowledge" : true,
         "upper_bound_knowledge": 5000
       },
 
@@ -31,22 +31,24 @@
 
           "concession_type": {
             "module" : "Concession",
-            "func" : "exponential_decay",
+            "func" : "behavioural_averaged_concession",
             "params" : {
-              "lambda" : 0.5
+              "delta": 2,
+              "beta": 0.8
             }
           },
 
           "acceptance_type": {
             "module" : "Acceptance",
-            "func": "rational_until_end",
+            "func": "greater_than_sqrt",
             "params" : {}
           },
 
           "generate_offer_type": {
             "module" : "GenerateOffers",
-            "func" : "random_offer",
+            "func" : "hyperopt_offer",
             "params" : {
+              "max_eval" : 15
             }
           },
 
@@ -58,14 +60,12 @@
 
           "ml_model": {
             "module" : "Classifiers",
-            "func": "example_classifier",
+            "func": "mlp_nn_classifier",
             "params": {
-              "norm":{
-                "norm": "l2"
-              },
-              "clf":{
-                "n_neighbors": 5
-              }
+              "solver": "lbfgs",
+              "alpha": 1e-5,
+              "hidden_layer_sizes": [128, 4],
+              "random_state": 1
             }
           }
        }

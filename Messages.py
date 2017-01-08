@@ -80,3 +80,7 @@ class Messages:
     @staticmethod
     def agent_definition_error(name, error):
         return "Error in agent %s definition, field %s is not defined" % (name, error)
+
+    @staticmethod
+    def usage():
+        return "\nUsage: python Main.py config_file.json\n"

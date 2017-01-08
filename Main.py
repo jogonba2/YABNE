@@ -7,9 +7,12 @@ from Agent import Agent
 from Messages import Messages
 from Exchange import Exchange
 from Statistics import Statistics
+from sys import argv
 
 def main():
-    with open("./config.json", "r") as fd:
+    if len(argv)!=2: print(Messages.usage()) ; exit()
+    else: config_fd = argv[1]
+    with open(config_fd, "r") as fd:
         config_file = load(fd)
         version = config_file["project_info"]["version"]
         author = config_file["project_info"]["author"]
@@ -17,7 +20,7 @@ def main():
         for agent_name in config_file["agents"]:
             agent = Agent(definition_json=config_file["agents"][agent_name])
             err = agent.get_valid()
-            if err!=True:
+            if err != True:
                 print(Messages.agent_definition_error(agent_name, err))
                 exit()
             agents.append(agent)

@@ -1,85 +1,73 @@
 {
     "agent_info" : {
-      "name": "TyrionPrimeraPrueba",
+      "name": "Tyrion",
       "gender": "male",
       "country": "spain",
-      "birthday": "16/08/91",
-      "reputation": 0.3,
+      "birthday": "16/08/90",
+      "reputation": 0.2,
       "description" : "tyrion, interested in ...",
-      "using_oponent_knowledge" : false,
-      "domain" : "car sale"
+      "domain" : "Product sale"
     },
 
-    "attributes" : {"price" : "integer", "color": "categorical", "abs": "categorical"},
+    "rol" : "Rols/Seller.json",
 
-	"weights_attr" : {
-		"price" : 0.6,
-		"color" : 0.2,
-		"abs"    : 0.2
-	},
-	
-	"values_attr" : {
+    "params" : {
 
-		"integer"     : {
-			"price" : {
-                "properties" : {
-                    "max" : 3000,
-                    "min" : 0
-                },
-                "conditions" : {
-				    "cond_1" : [0, 1000, 1],
-				    "cond_2" : [1000, 2000, 0.5],
-				    "cond_3" : [2000, 7500, 0.3],
-                    "cond_4" : [7500, Infinity, 0]
-                }
-			}
-		},
-		"float"       : {},
-		"categorical" : {
-			"color" : {
-                "properties" : {
-                  "choices" : [0, 1, 2]
-                },
-                "conditions" : {
-				    "cond_1" : [0, 0.4],
-				    "cond_2" : [1, 0.1],
-				    "cond_3" : [2, 1]
-                }
-			},
-			"abs" : {
-                "properties" : {
-                    "choices" : [0, 1]
-                },
-                "conditions" : {
-				    "cond_1" : [1, 1],
-				    "cond_2" : [0 , 0]
-                }
-			}	
-		}
+      "general" : {
+        "ur": 0.45,
+        "revoke_step": 200,
+        "s": 0.75,
+        "window_offer": 0.1,
+        "use_knowledge" : false,
+        "upper_bound_knowledge": 5000
+      },
 
-	},
+      "strategies": {
+          "utility_type": {
+            "module" : "Utility",
+            "func" : "linear",
+            "params" : {}
+          },
 
-    "utility_type" : "linear",
+          "concession_type": {
+            "module" : "Concession",
+            "func" : "exponential_decay",
+            "params" : {
+              "lambda" : 0.5
+            }
+          },
 
-    "revoke_step" : 200,
+          "acceptance_type": {
+            "module" : "Acceptance",
+            "func": "rational_until_end",
+            "params" : {}
+          },
 
-    "ur" : 0.5,
+          "generate_offer_type": {
+            "module" : "GenerateOffers",
+            "func" : "random_offer",
+            "params" : {
+            }
+          },
 
-    "delta" : 2,
+          "receive_offer_type": {
+            "module" : "ReceiveOffers",
+            "func" : "receive_max_offers",
+            "params" : {}
+          },
 
-    "beta" : 0.8,
-
-    "concession_type" : "behavioural_relative_concession",
-
-    "acceptance_type" : "rational",
-
-    "offer_type" : "hyperopt_offer",
-
-    "s" : 0.9,
-
-    "window_offer" : 0.2,
-
-    "ml_model" : "mlp_nn_classifier",
-
-    "upper_bound_knowledge" : 500
+          "ml_model": {
+            "module" : "Classifiers",
+            "func": "example_classifier",
+            "params": {
+              "norm":{
+                "norm": "l2"
+              },
+              "clf":{
+                "n_neighbors": 5
+              }
+            }
+          }
+       }
+    }
 }

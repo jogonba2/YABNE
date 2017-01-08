@@ -1,0 +1,134 @@
+{
+      "attributes" : {"precio_naranjas" : "integer", "precio_melones": "integer",
+					"precio_cobre" : "float", "precio_navajas" : "float",
+					"color_naranjas" : "categorical", "color_melones" : "categorical",
+					"metal_navaja" : "categorical", "calidad_cobre": "categorical"},
+
+
+	"weights_attr" : {
+		"precio_naranjas" : 0.1,
+		"precio_melones" : 0.2,
+		"precio_cobre" : 0.1,
+		"precio_navajas" : 0.1,
+		"color_naranjas" : 0.1,
+		"color_melones"  : 0.2,
+		"calidad_cobre" : 0.1,
+		"metal_navaja" : 0.1
+	},
+
+	"values_attr" : {
+
+		"integer"     : {
+			"precio_naranjas" : {
+                "properties" : {
+                    "max" : 2500,
+                    "min" : 500
+                },
+                "conditions" : {
+				    "cond_1" : [500, 1000, 0.5],
+				    "cond_2" : [1000, 2000, 0.2],
+				    "cond_3" : [2000, 2500, 1]
+                }
+			},
+			"precio_melones" : {
+                "properties" : {
+                    "max" : 7500,
+                    "min" : 200
+                },
+                "conditions" : {
+				    "cond_1" : [200, 1000, 0.2],
+				    "cond_2" : [1000, 3000, 0.3],
+				    "cond_3" : [3000, 6500, 0.55],
+				    "cond_4" : [6500, 7500, 0.95]
+                }
+			}
+		},
+
+		"float"       : {
+
+				"precio_cobre" : {
+					"properties" : {
+						"max" : 1500,
+						"min" : 100
+					},
+					"conditions" : {
+						"cond_1" : [100, 500, 0.1],
+						"cond_2" : [500, 1000, 0.2],
+						"cond_3" : [1000, 1500, 0.75]
+					}
+				},
+
+				"precio_navajas" : {
+					"properties" : {
+						"max" : 3200,
+						"min" : 50
+					},
+					"conditions" : {
+						"cond_1" : [50, 1000, 1],
+						"cond_2" : [1000, 2000, 0.76],
+						"cond_3" : [2000, 3000, 0.32],
+						"cond_4" : [3000, 3200, 0.18]
+					}
+				}
+
+			},
+
+		"categorical" : {
+
+			"color_naranjas" : {
+
+                "properties" : {
+                  "choices" : [0, 1, 2, 3, 4]
+                },
+
+                "conditions" : {
+				    "cond_1" : [0, 0.2],
+				    "cond_2" : [1, 0.3],
+				    "cond_3" : [2, 0.7],
+				    "cond_4" : [3, 0.5],
+				    "cond_5" : [4, 0.2]
+                }
+			},
+			"color_melones" : {
+                "properties" : {
+                    "choices" : [0, 1, 2, 3]
+                },
+                "conditions" : {
+				    "cond_1" : [1, 0.2],
+				    "cond_2" : [0 , 0.56],
+				    "cond_3" : [2, 0.26],
+				    "cond_4" : [3, 0.73]
+                }
+			},
+
+			"calidad_cobre" : {
+                "properties" : {
+                    "choices" : [0, 1, 2, 3]
+                },
+                "conditions" : {
+				    "cond_1" : [1, 0.27],
+				    "cond_2" : [0 , 0.2],
+				    "cond_3" : [2, 0.66],
+				    "cond_4" : [3, 0.41]
+                }
+			},
+
+			"metal_navaja" : {
+                "properties" : {
+                    "choices" : [0, 1, 2, 3, 4, 5, 6, 7]
+                },
+                "conditions" : {
+				    "cond_1" : [1, 0.27],
+				    "cond_2" : [0 , 0.15],
+				    "cond_3" : [2, 0.66],
+				    "cond_4" : [3, 0.41],
+				    "cond_5" : [4, 0.38],
+				    "cond_6" : [5, 0.86],
+				    "cond_7" : [6, 0.23],
+				    "cond_8" : [7, 0.48]
+                }
+			}
+		}
+
+	}
+}

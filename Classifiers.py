@@ -10,67 +10,94 @@ from sklearn import svm
 from sklearn.neighbors import KNeighborsClassifier, NearestCentroid
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.preprocessing import normalize
 
 class Classifiers:
 
-    # Solo funciona con el dominio de ejemplo hasta que se parametrice (4 neuronas en la capa de salida) #
     @staticmethod
-    def mlp_nn_classifier(X, Y):
-        clf = MLPClassifier(solver="lbfgs", alpha=1e-5,
-                            hidden_layer_sizes=(128, 4), random_state=1)
+    def mlp_nn_classifier(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = MLPClassifier(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def gaussian_nb(X, Y):
-        clf = GaussianNB()
+    def gaussian_nb(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = GaussianNB(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def svm(X, Y, kernel="linear"):
-        clf = svm.SVC(kernel=kernel)
+    def svm(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = svm.SVC(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def ada_boost(X, Y, n_estimators=50):
-        clf = AdaBoostClassifier(n_estimators=n_estimators)
+    def ada_boost(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = AdaBoostClassifier(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def random_forest(X, Y, n_estimators=10):
-        clf = RandomForestClassifier(n_estimators=n_estimators)
+    def random_forest(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = RandomForestClassifier(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def decision_tree(X, Y):
-        clf = DecisionTreeClassifier()
+    def decision_tree(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = DecisionTreeClassifier(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def bernoulli_nb(X, Y):
-        clf = BernoulliNB()
+    def bernoulli_nb(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = BernoulliNB(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def multinomial_nb(X, Y):
-        clf = MultinomialNB()
+    def multinomial_nb(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = MultinomialNB(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def nearest_centroid(X, Y, k=1):
-        clf = NearestCentroid()
+    def nearest_centroid(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = NearestCentroid(**method_params)
         clf.fit(X, Y)
         return clf
 
     @staticmethod
-    def k_nearest_neighbors(X, Y, k=1):
-        clf = KNeighborsClassifier(n_neighbors=k)
+    def k_nearest_neighbors(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = KNeighborsClassifier(**method_params)
         clf.fit(X, Y)
         return clf
+
+    @staticmethod
+    def gaussian_process_classifier(X, Y, parameters):
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]
+        clf = GaussianProcessClassifier(**method_params)
+        clf.fit(X, Y)
+        return clf
+
+    @staticmethod
+    def example_classifier(X, Y, parameters):
+        norm_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]["norm"]
+        method_params = parameters["static"]["params"]["strategies"]["ml_model"]["params"]["clf"]
+        X = normalize(X, **norm_params)
+        clf = KNeighborsClassifier(**method_params)
+        clf.fit(X, Y)
+        return clf
+

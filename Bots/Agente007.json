@@ -1,11 +1,11 @@
 {
     "agent_info" : {
-      "name": "Daneris",
-      "gender": "female",
+      "name": "Agent007",
+      "gender": "male",
       "country": "spain",
-      "birthday": "16/08/77",
-      "reputation": 0.96,
-      "description" : "daneris, interested in ...",
+      "birthday": "16/08/94",
+      "reputation": 0.8,
+      "description" : "negotiating in product sale domain. Other domains of interest: car sale",
       "domain" : "Product sale"
     },
 
@@ -18,8 +18,8 @@
         "revoke_step": 200,
         "s": 0.75,
         "window_offer": 0.1,
-        "use_knowledge" : false,
-        "upper_bound_knowledge": 5000
+        "use_knowledge" : true,
+        "upper_bound_knowledge": 250
       },
 
       "strategies": {
@@ -52,20 +52,18 @@
 
           "receive_offer_type": {
             "module" : "ReceiveOffers",
-            "func" : "receive_max_offers",
+            "func" : "receive_random_offers",
             "params" : {}
           },
 
           "ml_model": {
             "module" : "Classifiers",
-            "func": "example_classifier",
+            "func": "mlp_nn_classifier",
             "params": {
-              "norm":{
-                "norm": "l2"
-              },
-              "clf":{
-                "n_neighbors": 5
-              }
+              "solver": "lbfgs",
+              "alpha": 1e-5,
+              "hidden_layer_sizes": [128, 4],
+              "random_state": 1
             }
           }
        }

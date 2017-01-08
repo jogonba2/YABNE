@@ -1,15 +1,14 @@
 {
 
   "project_info" : {
-    "version" : "0.4",
+    "version" : "0.5",
     "author" : "JAGB"
   },
 
   "agents" : {
-    "Tyrion" : "./Bots/TyrionPrimeraPrueba.json",
-    "JohnSnow" : "./Bots/JohnSnowPrimeraPrueba.json",
-    "Daneris" : "./Bots/DanerisPrimeraPrueba.json"
-
+    "Tyrion": "./Bots/TyrionPrimeraPrueba.json",
+    "JohnSnow": "./Bots/JohnSnowPrimeraPrueba.json",
+    "Daneris": "./Bots/DanerisPrimeraPrueba.json"
   },
 
   "knowledge" : {
@@ -22,7 +21,7 @@
     "show_offers" : true,
     "first_random" : false,
     "graphic_process" : true,
-    "graphic_interactive" : false
+    "graphic_interactive" : true
   }
 
 }

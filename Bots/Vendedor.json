@@ -1,11 +1,11 @@
 {
     "agent_info" : {
-      "name": "Daneris",
-      "gender": "female",
+      "name": "Vendedor1",
+      "gender": "male",
       "country": "spain",
-      "birthday": "16/08/77",
-      "reputation": 0.96,
-      "description" : "daneris, interested in ...",
+      "birthday": "16/08/91",
+      "reputation": 0.3,
+      "description" : "tyrion, interested in ...",
       "domain" : "Product sale"
     },
 
@@ -18,7 +18,7 @@
         "revoke_step": 200,
         "s": 0.75,
         "window_offer": 0.1,
-        "use_knowledge" : false,
+        "use_knowledge" : true,
         "upper_bound_knowledge": 5000
       },
 

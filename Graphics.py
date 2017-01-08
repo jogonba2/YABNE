@@ -3,6 +3,8 @@
 #  Acceptance.py
 
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
 
 class Graphics:
 
